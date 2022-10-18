@@ -8,9 +8,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
   });
 });
 
-function generate(value,config,css) {
-  console.log(value,css);
-  
+function generate(value,config,css) {  
   let href = 'mailto:'+value;
   if (config.subject) {
     href = href + '?subject='+config.subject;
