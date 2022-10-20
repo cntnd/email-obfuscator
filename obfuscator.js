@@ -1,56 +1,77 @@
-document.addEventListener("DOMContentLoaded", function(event) { 
-  document.querySelectorAll(".email").forEach((element, key) => {
+document.addEventListener("DOMContentLoaded", function (event) {
+    document.querySelectorAll(".email").forEach((element, key) => {
+        deobfuscate(element);
+    });
+});
+
+function deobfuscateInText(selector) {
+    document.querySelectorAll(selector).forEach((block, key) => {
+        const regex = /([^\s]+)\w+\[at\]([^\s]+)\w+\[dot\]+\w([^\s]+)/ig;
+        let content = block.innerHTML;
+        content.match(regex).forEach((element, key) => {
+            let html = generate(element.replace(/\[at\]/ig, '@').replace(/\[dot\]/ig, '.'), undefined, "email");
+            content = content.replace(element, html.outerHTML);
+        });
+        block.innerHTML = content;
+    });
+}
+
+function deobfuscate(element) {
     let config = element.dataset;
     let css = element.classList;
     let content = element.textContent.replace(/\s+/g, '');
     let html = generate(content.replace(/\[at\]/ig, '@').replace(/\[dot\]/ig, '.'), config, css);
     element.replaceWith(html);
-  });
-});
+}
 
-function generate(value,config,css) {  
-  let href = 'mailto:'+value;
-  if (config.subject) {
-    href = href + '?subject='+config.subject;
-  }
-  // Body
-  if (config.body) {
-    let sep = '?';
-    if (href.charAt(href.length-1)==='?') {
-      sep = '&';
+function generate(value, config, css) {
+    let href = 'mailto:' + value;
+    let display = value;
+    const template = document.createElement('a');
+
+    // css
+    if (css != undefined){
+        template.classList = css;
     }
-    href = href + sep + 'body='+config.body;
-  }
-  // CC
-  if (config.cc) {
-    let sep = '?';
-    if (href.charAt(href.length-1)==='?') {
-      sep = '&';
+    // config
+    if (config!==undefined){
+        if (config.subject) {
+            href = href + '?subject=' + config.subject;
+        }
+        // Body
+        if (config.body) {
+            let sep = '?';
+            if (href.charAt(href.length - 1) === '?') {
+                sep = '&';
+            }
+            href = href + sep + 'body=' + config.body;
+        }
+        // CC
+        if (config.cc) {
+            let sep = '?';
+            if (href.charAt(href.length - 1) === '?') {
+                sep = '&';
+            }
+            href = href + sep + 'cc=' + config.cc;
+        }
+        // BCC
+        if (config.bcc) {
+            let sep = '?';
+            if (href.charAt(href.length - 1) === '?') {
+                sep = '&';
+            }
+            href = href + sep + 'bcc=' + config.bcc;
+        }
+        // Display
+        if (config.display) {
+            display = config.display;
+        }
+        // css
+        if (config.classReplace) {
+            template.classList = config.classReplace;
+        }
     }
-    href = href + sep + 'cc='+config.cc;
-  }
-  // BCC
-  if (config.bcc) {
-    let sep = '?';
-    if (href.charAt(href.length-1)==='?') {
-      sep = '&';
-    }
-    href = href + sep + 'bcc='+config.bcc;
-  }
-  // Display
-  let display = value;
-  if (config.display) {
-    display = config.display;
-  }
-  const template = document.createElement('a');
-  if (config.classReplace){
-    template.classList.add(config.classReplace);
-  }
-  else {
-    template.classList = css;
-  }
-  template.textContent = display;
-  template.setAttribute('href', href);
-  console.log(template);
-  return template;
+    template.textContent = display;
+    template.setAttribute('href', href);
+    return template;
 }
