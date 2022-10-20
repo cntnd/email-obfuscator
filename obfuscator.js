@@ -8,11 +8,13 @@ function deobfuscateInText(selector) {
     document.querySelectorAll(selector).forEach((block, key) => {
         const regex = /([^\s]+)\w+\[at\]([^\s]+)\w+\[dot\]+\w([^\s]+)/ig;
         let content = block.innerHTML;
-        content.match(regex).forEach((element, key) => {
-            let html = generate(element.replace(/\[at\]/ig, '@').replace(/\[dot\]/ig, '.'), undefined, "email");
-            content = content.replace(element, html.outerHTML);
-        });
-        block.innerHTML = content;
+        if (content!==undefined) {
+            content.match(regex).forEach((element, key) => {
+                let html = generate(element.replace(/\[at\]/ig, '@').replace(/\[dot\]/ig, '.'), undefined, "email");
+                content = content.replace(element, html.outerHTML);
+            });
+            block.innerHTML = content;
+        }
     });
 }
 
@@ -30,7 +32,7 @@ function generate(value, config, css) {
     const template = document.createElement('a');
 
     // css
-    if (css != undefined){
+    if (css !== undefined){
         template.classList = css;
     }
     // config
