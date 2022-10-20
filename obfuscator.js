@@ -9,7 +9,7 @@
             const regex = /([^\s]+)\w+\[at\]([^\s]+)\w+\[dot\]+[a-zA-Z]+/ig;
             let content = block.innerHTML;
             if (content!==undefined) {
-                content.match(regex).forEach((element, key) => {
+                content.match(regex)?.forEach((element, key) => {
                     let html = generate(element.replace(/\[at\]/ig, '@').replace(/\[dot\]/ig, '.'), undefined, "email");
                     content = content.replace(element, html.outerHTML);
                 });
